@@ -1,0 +1,21 @@
+# Gradle / build
+.gradle/
+build/
+/captures
+.externalNativeBuild
+.cxx
+.kotlin/
+
+# Configuración local (rutas del SDK de cada máquina)
+local.properties
+
+# IDE
+*.iml
+.idea/
+.DS_Store
+
+# Llaves y artefactos firmados
+*.jks
+*.keystore
+*.apk
+*.aab
