@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# Valida Conventional Commits antes de crear el commit.
+MSG=$(head -n1 "$1")
+PATTERN='^(feat|fix|docs|style|refactor|test|chore|ci|build|perf)(\([a-z0-9-]+\))?!?: .{1,72}$'
+
+[[ "$MSG" =~ ^Merge ]] && exit 0
+
+if [[ ! "$MSG" =~ $PATTERN ]]; then
+  echo "❌ Mensaje de commit inválido: \"$MSG\""
+  echo "   Formato: tipo: descripción  (ej. feat: data models and routes)"
+  echo "   Tipos válidos: feat fix docs style refactor test chore ci build perf"
+  exit 1
+fi

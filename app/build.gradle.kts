@@ -80,3 +80,11 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 }
+
+// Activa los hooks de Git del equipo automáticamente (.githooks/commit-msg)
+val installGitHooks by tasks.registering(Exec::class) {
+    workingDir = rootDir
+    commandLine("git", "config", "core.hooksPath", ".githooks")
+    isIgnoreExitValue = true // no rompe el build si Git no está disponible (p. ej. en CI)
+}
+tasks.named("preBuild") { dependsOn(installGitHooks) }
