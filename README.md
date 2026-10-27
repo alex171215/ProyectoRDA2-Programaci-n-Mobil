@@ -36,6 +36,12 @@ com.puce.ecotrip
 ```
 
 ## Flujo de trabajo Git
+**Configuración inicial (una sola vez, después de clonar):**
+```bash
+git config core.hooksPath .githooks
+```
+Esto activa la validación local de mensajes de commit (Conventional Commits). Ya viene activada por defecto, sin embargo, pueden volver a activarla para asegurar.
+
 - `main` protegida: todo entra por Pull Request aprobado por QA (Rol 5).
 - Una rama por hito; cada integrante commitea con **su** cuenta (`git config user.email` = email de GitHub).
 

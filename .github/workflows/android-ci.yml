@@ -1,0 +1,91 @@
+name: Android CI
+
+on:
+  push:
+    branches: [ main, "feat/**", "fix/**" ]
+  pull_request:
+    branches: [ main ]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  commit-lint:
+    name: Convención de commits
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Validar mensajes del PR
+        run: |
+          PATTERN='^(feat|fix|docs|style|refactor|test|chore|ci|build|perf)(\([a-z0-9-]+\))?!?: .{1,72}$'
+          BAD=0
+          while IFS= read -r msg; do
+            [[ "$msg" =~ ^Merge ]] && continue
+            if [[ ! "$msg" =~ $PATTERN ]]; then
+              echo "❌ $msg"; BAD=1
+            else
+              echo "✅ $msg"
+            fi
+          done < <(git log --format=%s origin/${{ github.base_ref }}..${{ github.event.pull_request.head.sha }})
+          exit $BAD
+
+  build:
+    name: Auditoría, lint, tests y build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: JDK 21 (JetBrains Runtime)
+        uses: actions/setup-java@v4
+        with:
+          distribution: jetbrains
+          java-version: "21"
+
+      - name: Gradle con caché
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Permisos de ejecución
+        run: chmod +x gradlew scripts/qa-audit.sh
+
+      - name: Auditoría QA (reglas del examen)
+        run: bash scripts/qa-audit.sh
+
+      - name: Verificar entorno (API 36 / Java 21)
+        run: |
+          grep -q "compileSdk = 36" app/build.gradle.kts
+          grep -q "targetSdk = 36" app/build.gradle.kts
+          grep -q "JvmTarget.JVM_21" app/build.gradle.kts
+          echo "✅ Entorno conforme"
+
+      - name: Lint
+        run: ./gradlew lintDebug
+
+      - name: Tests unitarios
+        run: ./gradlew testDebugUnitTest
+
+      - name: Compilar APK debug
+        run: ./gradlew assembleDebug
+
+      - name: Publicar APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: ecotrip-debug-apk
+          path: app/build/outputs/apk/debug/*.apk
+          retention-days: 7
+
+      - name: Publicar reportes
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: reportes-calidad
+          path: |
+            app/build/reports/lint-results-debug.html
+            app/build/reports/tests/
+          retention-days: 7
