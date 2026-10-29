@@ -1,5 +1,6 @@
 package com.puce.ecotrip.navigation
 
+
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -14,9 +15,7 @@ import com.puce.ecotrip.ui.screens.FormularioScreen
 import com.puce.ecotrip.ui.screens.ResumenScreen
 
 /**
- * Orquestador principal del grafo de navegación declarativo y fuertemente tipado.
- * Implementa Type-Safety con Navigation Compose 2.8+ / 2.9+, validando destinos en compilación.
- * Garantiza la higiene del Back Stack mediante popUpTo y la bandera launchSingleTop.
+ * Orquestador principal de la navegación de EcoTrip.
  */
 @Composable
 fun EcoTripNavHost(
@@ -31,7 +30,7 @@ fun EcoTripNavHost(
         startDestination = Rutas.Formulario,
         modifier = modifier
     ) {
-        // --- Destino 1: Formulario de Planificación ---
+        // Pantalla inicial: configuración del viaje.
         composable<Rutas.Formulario> {
             FormularioScreen(
                 uiState = uiState,
@@ -42,7 +41,9 @@ fun EcoTripNavHost(
                 onHuellaChange = viewModel::onBajaHuellaChange,
                 onGrupalChange = viewModel::onViajeGrupalChange,
                 onNavegarResumen = {
-                    val rutaResumen = viewModel.construirRutaResumen()
+                    val rutaResumen =
+                        viewModel.construirRutaResumen()
+
                     navController.navigate(rutaResumen) {
                         launchSingleTop = true
                     }
@@ -50,17 +51,16 @@ fun EcoTripNavHost(
             )
         }
 
-        // --- Destino 2: Resumen de Ruta Tipado ---
+        // Pantalla de resumen: recupera los argumentos tipados.
         composable<Rutas.Resumen> { backStackEntry ->
-            // Deserialización automática y segura del contrato fuertemente tipado
-            val resumenArgs = backStackEntry.toRoute<Rutas.Resumen>()
+            val resumenArgs =
+                backStackEntry.toRoute<Rutas.Resumen>()
 
             ResumenScreen(
                 resumen = resumenArgs,
                 onVolver = {
-                    // Higiene del Back Stack: evita instancias duplicadas de la pantalla anterior
                     navController.navigate(Rutas.Formulario) {
-                        popUpTo(Rutas.Formulario) {
+                        popUpTo<Rutas.Formulario> {
                             inclusive = false
                         }
                         launchSingleTop = true
