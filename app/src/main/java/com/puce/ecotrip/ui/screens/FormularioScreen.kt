@@ -55,7 +55,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.puce.ecotrip.data.model.TipoTransporte
-import com.puce.ecotrip.ui.FormularioUiState
+import com.puce.ecotrip.ui.EcoTripUiState
 import com.puce.ecotrip.ui.theme.EcoTripTheme
 
 /**
@@ -63,12 +63,12 @@ import com.puce.ecotrip.ui.theme.EcoTripTheme
  *
  * Es stateless (State Hoisting): todo lo que muestra llega en [uiState] y cada
  * interacción se notifica con una lambda. Las reglas de validación viven en
- * [FormularioUiState], no aquí. Solo usa colores de MaterialTheme (Material You).
+ * [EcoTripUiState] (EcoTripViewModel), no aquí. Solo usa colores de MaterialTheme (Material You).
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FormularioScreen(
-    uiState: FormularioUiState,
+    uiState: EcoTripUiState,
     onNombreChange: (String) -> Unit,
     onDestinoChange: (String) -> Unit,
     onDiasChange: (String) -> Unit,
@@ -416,7 +416,7 @@ private fun BotonVerResumen(
 private fun FormularioCompletoPreview() {
     EcoTripTheme {
         FormularioScreen(
-            uiState = FormularioUiState(nombreViajero = "Alejandro", destino = "Galápagos", diasTexto = "5"),
+            uiState = EcoTripUiState(nombreViajero = "Alejandro", destino = "Galápagos", diasTexto = "5", diasDuracion = 5, esFormularioValido = true),
             onNombreChange = {}, onDestinoChange = {}, onDiasChange = {},
             onTransporteChange = {}, onHuellaChange = {}, onGrupalChange = {},
             onNavegarResumen = {}
@@ -429,7 +429,7 @@ private fun FormularioCompletoPreview() {
 private fun FormularioVacioPreview() {
     EcoTripTheme {
         FormularioScreen(
-            uiState = FormularioUiState(),
+            uiState = EcoTripUiState(diasTexto = "", diasDuracion = 0),
             onNombreChange = {}, onDestinoChange = {}, onDiasChange = {},
             onTransporteChange = {}, onHuellaChange = {}, onGrupalChange = {},
             onNavegarResumen = {}
@@ -442,7 +442,7 @@ private fun FormularioVacioPreview() {
 private fun FormularioHorizontalPreview() {
     EcoTripTheme {
         FormularioScreen(
-            uiState = FormularioUiState(nombreViajero = "Alejandro", destino = "Galápagos", diasTexto = "5"),
+            uiState = EcoTripUiState(nombreViajero = "Alejandro", destino = "Galápagos", diasTexto = "5", diasDuracion = 5, esFormularioValido = true),
             onNombreChange = {}, onDestinoChange = {}, onDiasChange = {},
             onTransporteChange = {}, onHuellaChange = {}, onGrupalChange = {},
             onNavegarResumen = {}
